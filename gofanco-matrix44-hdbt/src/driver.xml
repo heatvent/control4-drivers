@@ -1,0 +1,328 @@
+<devicedata>
+  <copyright>Copyright 2026 Heatvent. MIT License.</copyright>
+  <creator>Heatvent (with Claude)</creator>
+  <manufacturer>GoFanco</manufacturer>
+  <name>GoFanco Matrix44-HDBT (DriverWorks)</name>
+  <model>Matrix44-HDBT</model>
+  <created>11/22/2026 12:00 PM</created>
+  <modified>11/22/2026 11:00 PM</modified>
+  <version>5</version>
+  <small image_source="c4z">icons/device_sm.png</small>
+  <large image_source="c4z">icons/device_lg.png</large>
+  <control>lua_gen</control>
+  <controlmethod>serial</controlmethod>
+  <driver>DriverWorks</driver>
+  <composer_categories>
+    <category>Audio/Video</category>
+  </composer_categories>
+  <minimum_os_version>2.10.0</minimum_os_version>
+  <proxies qty="1">
+    <proxy proxybindingid="5001" name="GoFanco Matrix44-HDBT" small_image="icons/device_sm.png" large_image="icons/device_lg.png" image_source="c4z">avswitch</proxy>
+  </proxies>
+  <capabilities>
+    <audio_consumer_count>0</audio_consumer_count>
+    <audio_provider_count>0</audio_provider_count>
+    <can_downclass>True</can_downclass>
+    <can_upclass>True</can_upclass>
+    <has_audio>False</has_audio>
+    <has_discrete_input_select>True</has_discrete_input_select>
+    <has_toad_input_select>False</has_toad_input_select>
+    <video_consumer_count>4</video_consumer_count>
+    <video_provider_count>4</video_provider_count>
+  </capabilities>
+  <connections>
+    <connection>
+      <id>1</id>
+      <facing>6</facing>
+      <connectionname>Serial RS-232</connectionname>
+      <type>1</type>
+      <consumer>True</consumer>
+      <audiosource>False</audiosource>
+      <videosource>False</videosource>
+      <linelevel>True</linelevel>
+      <classes><class><classname>RS_232</classname></class></classes>
+    </connection>
+    <connection>
+      <id>5001</id>
+      <facing>6</facing>
+      <connectionname>AV Switch</connectionname>
+      <type>2</type>
+      <consumer>False</consumer>
+      <audiosource>False</audiosource>
+      <videosource>False</videosource>
+      <linelevel>True</linelevel>
+      <classes><class><classname>AVSWITCH</classname></class></classes>
+    </connection>
+    <connection proxybindingid="5001">
+      <id>1000</id><facing>6</facing><connectionname>Input 1</connectionname><type>5</type>
+      <consumer>True</consumer><audiosource>False</audiosource><videosource>False</videosource><linelevel>True</linelevel>
+      <classes><class><classname>HDMI</classname></class></classes>
+    </connection>
+    <connection proxybindingid="5001">
+      <id>1001</id><facing>6</facing><connectionname>Input 2</connectionname><type>5</type>
+      <consumer>True</consumer><audiosource>False</audiosource><videosource>False</videosource><linelevel>True</linelevel>
+      <classes><class><classname>HDMI</classname></class></classes>
+    </connection>
+    <connection proxybindingid="5001">
+      <id>1002</id><facing>6</facing><connectionname>Input 3</connectionname><type>5</type>
+      <consumer>True</consumer><audiosource>False</audiosource><videosource>False</videosource><linelevel>True</linelevel>
+      <classes><class><classname>HDMI</classname></class></classes>
+    </connection>
+    <connection proxybindingid="5001">
+      <id>1003</id><facing>6</facing><connectionname>Input 4</connectionname><type>5</type>
+      <consumer>True</consumer><audiosource>False</audiosource><videosource>False</videosource><linelevel>True</linelevel>
+      <classes><class><classname>HDMI</classname></class></classes>
+    </connection>
+    <connection proxybindingid="5001">
+      <id>2000</id><facing>6</facing><connectionname>Output 1</connectionname><type>5</type>
+      <consumer>False</consumer><audiosource>False</audiosource><videosource>True</videosource><linelevel>True</linelevel>
+      <classes><class><classname>HDMI</classname></class></classes>
+    </connection>
+    <connection proxybindingid="5001">
+      <id>2001</id><facing>6</facing><connectionname>Output 2</connectionname><type>5</type>
+      <consumer>False</consumer><audiosource>False</audiosource><videosource>True</videosource><linelevel>True</linelevel>
+      <classes><class><classname>HDMI</classname></class></classes>
+    </connection>
+    <connection proxybindingid="5001">
+      <id>2002</id><facing>6</facing><connectionname>Output 3</connectionname><type>5</type>
+      <consumer>False</consumer><audiosource>False</audiosource><videosource>True</videosource><linelevel>True</linelevel>
+      <classes><class><classname>HDMI</classname></class></classes>
+    </connection>
+    <connection proxybindingid="5001">
+      <id>2003</id><facing>6</facing><connectionname>Output 4</connectionname><type>5</type>
+      <consumer>False</consumer><audiosource>False</audiosource><videosource>True</videosource><linelevel>True</linelevel>
+      <classes><class><classname>HDMI</classname></class></classes>
+    </connection>
+  </connections>
+  <config>
+    <serialsettings>9600 8 none 1 none 232</serialsettings>
+    <script file="driver.lua" />
+    <documentation><![CDATA[
+GoFanco Matrix44-HDBT (DriverWorks)
+
+By Heatvent (with Claude). MIT License. Unofficial - not made or supported by gofanco or Snap One/Control4.
+
+Full control driver for the gofanco Matrix44-HDBT (G4-0064B, HDMI 2.0 4x4 HDBaseT matrix kit) over RS-232, 9600 8N1. Uses the command set from the G4-0064B user guide (OUTxx:yy., PowerON., STA_VIDEO. ...).
+
+TESTED ON
+Matrix44-HDBT firmware V1.0.1 / CPLD V1.0.0, RS-232 from a Control4 EA-series controller, OS 3.4.3. The network (TCP/IP) port was not tested. Other gofanco matrix models use a different command set ("1V3.", "%9964.") and will not work with this driver.
+
+PORTS ON THIS MATRIX
+Outputs 1-3 are HDBaseT (CAT) outputs with receivers. Output 4 is the HDMI output. "Output 5" in some commands is the HDMI loop-out of output 3.
+
+WHAT IT DOES
+- Routes video for Control4 rooms (AV switch proxy, 4 inputs, 4 outputs).
+- Reads routing back (STA_VIDEO.) at startup and on a poll timer and shows it in "Output 1-4 Source". Front-panel / IR remote changes are picked up too.
+- Actions for every command in the guide's RS-232 table: system info, status queries, board temperature, IP address and setting a new IP, presets 1-9, front-panel lock, power, route-to-all, HDCP modes, HDMI 5V, PoC power to receivers, IR follow video, IR routing, receiver IR-to-MCU, de-embedded audio source, EDID (built-in, copy from display, read display EDID, restore default, status), CEC control of sources and displays, raw commands, guarded factory reset.
+- Not given buttons on purpose: "Baudrate" (changing it breaks the link to the controller), "EDIDUpgrade" (needs a .bin file upload), and "/+" pass-through. Use Send Raw Command if you ever need them.
+
+SETUP
+1. Connect the matrix's RS-232 port (3-pin Phoenix; use the included Phoenix-to-DB9 cable) to a controller serial port.
+2. In Composer, bind "Serial RS-232" to that controller serial port.
+3. Bind the HDMI inputs to your sources and the outputs to your displays/receivers.
+4. Refresh Navigators. The driver reads the current routing about 5 seconds after it loads; "Connection Status" should show Online.
+5. Power Handling defaults to "Room On/Off sends PowerON/PowerOFF": the matrix powers on when any room starts using it and off when the last room using it turns off (Control4 only sends OFF to a shared device once no room is using it, so several rooms can share a source). Set it to Ignore to keep the matrix on all the time.
+
+REPLACING A DRIVER BUILDER (.c4i) DRIVER
+This driver uses the standard AV switch connection IDs (inputs 1000-1003, outputs 2000-2003, serial 1, proxy 5001) and the same OUTxx:yy. routing command, so it can replace a Composer Driver Builder driver for this matrix: back up the project, add this driver, move each binding across, then delete the old driver.
+
+PROPERTIES THAT ARE INPUTS FOR ACTIONS
+Route Input / Route Output -> Apply Route, Route Input To All Outputs
+Preset Number -> Save / Recall / Show Preset
+Output Selection -> HDCP, HDMI 5V, PoC, EDID copy source, Read Display EDID, CEC display, IR routing (local IR out)
+Input Selection -> EDID built-in / copy target / status, CEC source
+Receiver Selection -> IR routing (receiver IR in), receiver IR controls MCU
+Built-in EDID Number -> EDID: Set Built-in
+Audio Out Source -> Set Audio Out Source
+New IP Address -> Set Matrix IP Address
+CEC Source Device Type (default 04 = Blu-ray) / CEC Display Device Type (TV: 40, 20 or 80) -> CEC actions
+Raw Command -> Send Raw Command (a trailing "." is added if missing)
+Confirm Factory Reset -> Factory Reset (RST.) only runs when set to "Yes, reset the matrix"
+
+PROGRAMMING COMMANDS
+Route Input To Output, Route Input To All Outputs, Recall Preset, Power On, Power Off, Refresh Status, Send Raw Command.
+]]></documentation>
+    <properties>
+      <property><name>Driver Version</name><type>STRING</type><readonly>true</readonly><default>3.1.0</default></property>
+      <property><name>Connection Status</name><type>STRING</type><readonly>true</readonly><default>Unknown</default></property>
+      <property><name>Output 1 Source</name><type>STRING</type><readonly>true</readonly><default>(unknown)</default></property>
+      <property><name>Output 2 Source</name><type>STRING</type><readonly>true</readonly><default>(unknown)</default></property>
+      <property><name>Output 3 Source</name><type>STRING</type><readonly>true</readonly><default>(unknown)</default></property>
+      <property><name>Output 4 Source</name><type>STRING</type><readonly>true</readonly><default>(unknown)</default></property>
+      <property><name>Power Status</name><type>STRING</type><readonly>true</readonly><default>(unknown)</default></property>
+      <property><name>Front Panel</name><type>STRING</type><readonly>true</readonly><default>(unknown)</default></property>
+      <property><name>IR Follows Video</name><type>STRING</type><readonly>true</readonly><default>(unknown)</default></property>
+      <property><name>Board Temperature</name><type>STRING</type><readonly>true</readonly><default>(not queried yet)</default></property>
+      <property><name>Matrix IP Address</name><type>STRING</type><readonly>true</readonly><default>(not queried yet)</default></property>
+      <property><name>Model Info</name><type>STRING</type><readonly>true</readonly><default>(not queried yet)</default></property>
+      <property><name>Firmware Version</name><type>STRING</type><readonly>true</readonly><default>(not queried yet)</default></property>
+      <property><name>Diagnostics</name><type>STRING</type><readonly>true</readonly><default>(run the Run Diagnostics action)</default></property>
+      <property><name>Last Command Sent</name><type>STRING</type><readonly>true</readonly><default></default></property>
+      <property><name>Last Response</name><type>STRING</type><readonly>true</readonly><default></default></property>
+      <property>
+        <name>Power Handling</name><type>LIST</type><readonly>false</readonly>
+        <items>
+          <item>Ignore (matrix stays on)</item>
+          <item>Room On/Off sends PowerON/PowerOFF</item>
+        </items>
+        <default>Room On/Off sends PowerON/PowerOFF</default>
+      </property>
+      <property>
+        <name>Poll Interval</name><type>LIST</type><readonly>false</readonly>
+        <items><item>Off</item><item>1 minute</item><item>5 minutes</item><item>15 minutes</item></items>
+        <default>5 minutes</default>
+      </property>
+      <property>
+        <name>Route Input</name><type>LIST</type><readonly>false</readonly>
+        <items><item>1</item><item>2</item><item>3</item><item>4</item></items>
+        <default>1</default>
+      </property>
+      <property>
+        <name>Route Output</name><type>LIST</type><readonly>false</readonly>
+        <items><item>1</item><item>2</item><item>3</item><item>4</item></items>
+        <default>3</default>
+      </property>
+      <property>
+        <name>Preset Number</name><type>LIST</type><readonly>false</readonly>
+        <items><item>1</item><item>2</item><item>3</item><item>4</item><item>5</item><item>6</item><item>7</item><item>8</item><item>9</item></items>
+        <default>1</default>
+      </property>
+      <property>
+        <name>Output Selection</name><type>LIST</type><readonly>false</readonly>
+        <items>
+          <item>All</item>
+          <item>1 (HDBaseT)</item>
+          <item>2 (HDBaseT)</item>
+          <item>3 (HDBaseT)</item>
+          <item>4 (HDMI)</item>
+          <item>5 (HDMI loop-out of 3)</item>
+        </items>
+        <default>All</default>
+      </property>
+      <property>
+        <name>Input Selection</name><type>LIST</type><readonly>false</readonly>
+        <items><item>All</item><item>1</item><item>2</item><item>3</item><item>4</item></items>
+        <default>All</default>
+      </property>
+      <property>
+        <name>Receiver Selection</name><type>LIST</type><readonly>false</readonly>
+        <items><item>All</item><item>1</item><item>2</item><item>3</item></items>
+        <default>All</default>
+      </property>
+      <property>
+        <name>Built-in EDID Number</name><type>LIST</type><readonly>false</readonly>
+        <items>
+          <item>01</item><item>02</item><item>03</item><item>04</item><item>05</item><item>06</item><item>07</item><item>08</item>
+          <item>09 (user-defined)</item>
+        </items>
+        <default>01</default>
+      </property>
+      <property>
+        <name>Audio Out Source</name><type>LIST</type><readonly>false</readonly>
+        <items><item>Output 1</item><item>Output 2</item><item>Output 3</item><item>Output 4</item></items>
+        <default>Output 1</default>
+      </property>
+      <property><name>New IP Address</name><type>STRING</type><readonly>false</readonly><default>192.168.0.178</default></property>
+      <property><name>CEC Source Device Type</name><type>STRING</type><readonly>false</readonly><default>04</default></property>
+      <property><name>CEC Display Device Type</name><type>STRING</type><readonly>false</readonly><default>40</default></property>
+      <property><name>Raw Command</name><type>STRING</type><readonly>false</readonly><default>STA.</default></property>
+      <property>
+        <name>Confirm Factory Reset</name><type>LIST</type><readonly>false</readonly>
+        <items><item>No</item><item>Yes, reset the matrix</item></items>
+        <default>No</default>
+      </property>
+      <property>
+        <name>Debug Mode</name><type>LIST</type><readonly>false</readonly>
+        <items><item>Off</item><item>On</item></items>
+        <default>Off</default>
+      </property>
+    </properties>
+    <actions>
+      <action><name>Refresh Status</name><command>REFRESH</command></action>
+      <action><name>Run Diagnostics (all status queries)</name><command>DIAGNOSTICS</command></action>
+      <action><name>Query IP Address</name><command>QUERY_IP</command></action>
+      <action><name>Set Matrix IP Address (New IP Address)</name><command>SET_IP</command></action>
+      <action><name>Query Name, Model and Firmware</name><command>QUERY_INFO</command></action>
+      <action><name>Query Board Temperature</name><command>QUERY_TEMP</command></action>
+      <action><name>Apply Route</name><command>APPLY_ROUTE</command></action>
+      <action><name>Route Input To All Outputs</name><command>ROUTE_ALL</command></action>
+      <action><name>Save Preset</name><command>PRESET_SAVE</command></action>
+      <action><name>Recall Preset</name><command>PRESET_RECALL</command></action>
+      <action><name>Show Preset Contents</name><command>PRESET_SHOW</command></action>
+      <action><name>Power On</name><command>POWER_ON</command></action>
+      <action><name>Power Off</name><command>POWER_OFF</command></action>
+      <action><name>Lock Front Panel</name><command>LOCK</command></action>
+      <action><name>Unlock Front Panel</name><command>UNLOCK</command></action>
+      <action><name>HDCP: Follow Display (Output Selection)</name><command>HDCP_MAT</command></action>
+      <action><name>HDCP: Follow Input / Bypass (Output Selection)</name><command>HDCP_BYP</command></action>
+      <action><name>HDCP: Force 1.4 On (Output Selection)</name><command>HDCP_ON</command></action>
+      <action><name>HDCP: Force Off (Output Selection)</name><command>HDCP_OFF</command></action>
+      <action><name>HDMI 5V On (Output Selection: All, 4, 5)</name><command>HDMI5V_ON</command></action>
+      <action><name>HDMI 5V Off (Output Selection: All, 4, 5)</name><command>HDMI5V_OFF</command></action>
+      <action><name>Receiver PoC Power On (Output Selection: All, 1-3)</name><command>POC_ON</command></action>
+      <action><name>Receiver PoC Power Off (Output Selection: All, 1-3)</name><command>POC_OFF</command></action>
+      <action><name>IR Follows Video On</name><command>IRFV_ON</command></action>
+      <action><name>IR Follows Video Off</name><command>IRFV_OFF</command></action>
+      <action><name>IR Route: Receiver IR In to Local IR Out (Receiver/Output Selection)</name><command>IR_ROUTE</command></action>
+      <action><name>Receiver IR Controls Matrix On (Receiver Selection)</name><command>IRRCM_ON</command></action>
+      <action><name>Receiver IR Controls Matrix Off (Receiver Selection)</name><command>IRRCM_OFF</command></action>
+      <action><name>Set Audio Out Source</name><command>AUDIO_SRC</command></action>
+      <action><name>EDID: Set Built-in (Input Selection, Built-in EDID Number)</name><command>EDID_BUILTIN</command></action>
+      <action><name>EDID: Copy From Display (Output Selection to Input Selection)</name><command>EDID_COPY</command></action>
+      <action><name>EDID: Read Display EDID (Output Selection)</name><command>EDID_READ</command></action>
+      <action><name>EDID: Restore Factory Default</name><command>EDID_DEFAULT</command></action>
+      <action><name>EDID: Show Status (Input Selection)</name><command>EDID_STATUS</command></action>
+      <action><name>CEC Source: Power On (Input Selection)</name><command>CECI_6D</command></action>
+      <action><name>CEC Source: Power Off (Input Selection)</name><command>CECI_6C</command></action>
+      <action><name>CEC Source: Main Menu</name><command>CECI_0A</command></action>
+      <action><name>CEC Source: Up</name><command>CECI_01</command></action>
+      <action><name>CEC Source: Down</name><command>CECI_02</command></action>
+      <action><name>CEC Source: Left</name><command>CECI_03</command></action>
+      <action><name>CEC Source: Right</name><command>CECI_04</command></action>
+      <action><name>CEC Source: Enter</name><command>CECI_00</command></action>
+      <action><name>CEC Source: Back</name><command>CECI_09</command></action>
+      <action><name>CEC Source: Exit Menu</name><command>CECI_0D</command></action>
+      <action><name>CEC Display: Power On (Output Selection: All, 4, 5)</name><command>CECO_ON</command></action>
+      <action><name>CEC Display: Power Off (Output Selection: All, 4, 5)</name><command>CECO_OFF</command></action>
+      <action><name>CEC Display: Volume Up</name><command>CECO_41</command></action>
+      <action><name>CEC Display: Volume Down</name><command>CECO_42</command></action>
+      <action><name>CEC Display: Mute</name><command>CECO_43</command></action>
+      <action><name>Send Raw Command</name><command>SEND_RAW</command></action>
+      <action><name>Factory Reset (RST)</name><command>FACTORY_RESET</command></action>
+    </actions>
+    <commands>
+      <command>
+        <name>Route Input To Output</name>
+        <description>Route Input PARAM1 to Output PARAM2</description>
+        <params>
+          <param><name>Input</name><type>RANGED_INTEGER</type><minimum>1</minimum><maximum>4</maximum></param>
+          <param><name>Output</name><type>RANGED_INTEGER</type><minimum>1</minimum><maximum>4</maximum></param>
+        </params>
+      </command>
+      <command>
+        <name>Route Input To All Outputs</name>
+        <description>Route Input PARAM1 to every output</description>
+        <params>
+          <param><name>Input</name><type>RANGED_INTEGER</type><minimum>1</minimum><maximum>4</maximum></param>
+        </params>
+      </command>
+      <command>
+        <name>Recall Preset</name>
+        <description>Recall matrix preset PARAM1</description>
+        <params>
+          <param><name>Preset</name><type>RANGED_INTEGER</type><minimum>1</minimum><maximum>9</maximum></param>
+        </params>
+      </command>
+      <command><name>Power On</name><description>Power the matrix on</description></command>
+      <command><name>Power Off</name><description>Power the matrix off</description></command>
+      <command><name>Refresh Status</name><description>Read the current routing from the matrix</description></command>
+      <command>
+        <name>Send Raw Command</name>
+        <description>Send PARAM1 to the matrix</description>
+        <params>
+          <param><name>Command</name><type>STRING</type></param>
+        </params>
+      </command>
+    </commands>
+  </config>
+</devicedata>
