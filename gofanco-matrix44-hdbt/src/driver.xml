@@ -6,7 +6,7 @@
   <model>Matrix44-HDBT</model>
   <created>11/22/2026 12:00 PM</created>
   <modified>11/23/2026 09:00 PM</modified>
-  <version>7</version>
+  <version>8</version>
   <small image_source="c4z">icons/device_sm.png</small>
   <large image_source="c4z">icons/device_lg.png</large>
   <control>lua_gen</control>
@@ -100,7 +100,7 @@
     <documentation><![CDATA[
 GoFanco Matrix44-HDBT (DriverWorks)
 
-By Heatvent (with Claude). MIT License. Unofficial - not made or supported by gofanco or Snap One/Control4.
+By Heatvent (with Claude). MIT License. Unofficial - not made or supported by gofanco or Snap One/Control4. The gofanco name and logo are trademarks of gofanco, used only to identify the device.
 
 Full control driver for the gofanco Matrix44-HDBT (G4-0064B, HDMI 2.0 4x4 HDBaseT matrix kit) over RS-232 (9600 8N1) or over the network (the matrix's LAN port, TCP port 23). Uses the command set from the G4-0064B user guide (OUTxx:yy., PowerON., STA_VIDEO. ...). Pick the link with the Connection Type property.
 
@@ -151,7 +151,7 @@ PROGRAMMING COMMANDS
 Route Input To Output, Route Input To All Outputs, Recall Preset, Power On, Power Off, Refresh Status, Send Raw Command.
 ]]></documentation>
     <properties>
-      <property><name>Driver Version</name><type>STRING</type><readonly>true</readonly><default>3.2.1</default></property>
+      <property><name>Driver Version</name><type>STRING</type><readonly>true</readonly><default>3.2.2</default></property>
       <property>
         <name>Connection Type</name><type>LIST</type><readonly>false</readonly>
         <items><item>Serial (RS-232)</item><item>Network (TCP/IP)</item></items>

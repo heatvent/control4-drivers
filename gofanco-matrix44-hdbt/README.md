@@ -6,7 +6,7 @@ A full-control Control4 driver for the **gofanco Matrix44-HDBT** 4x4 HDMI 2.0 HD
 
 It works as a normal Control4 AV switch, so rooms route sources through the matrix automatically. It also exposes every command in the matrix's RS-232 table as Composer actions: status, presets, EDID, HDCP, PoC, IR, CEC and more.
 
-> **Unofficial.** gofanco and Snap One/Control4 did not make this driver and don't support it. Use at your own risk.
+> **Unofficial.** gofanco and Snap One/Control4 did not make this driver and don't support it. Use at your own risk. The gofanco name and logo are trademarks of gofanco and are used only to identify the device this driver controls.
 
 **[Download gofanco_matrix44_hdbt.c4z](gofanco_matrix44_hdbt.c4z)**
 

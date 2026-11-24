@@ -9,9 +9,10 @@
   Author: Heatvent (with Claude)
   License: MIT (see LICENSE)
   Unofficial - not made or supported by gofanco or Snap One/Control4.
+  The gofanco name and logo are trademarks of gofanco, used only to identify the device.
 ]]
 
-DRIVER_VERSION   = "3.2.1"
+DRIVER_VERSION   = "3.2.2"
 SERIAL_BINDING   = 1
 NETWORK_BINDING  = 6001
 PROXY_BINDING    = 5001

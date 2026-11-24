@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.2.2 — 2026-11-23
+- Driver and device icons now use the gofanco logo.
+
 ## 3.2.1 — 2026-11-23
 - `STA.` and `/^Version.` now wait up to 2 s of silence before their reply is treated as complete. `STA.` pauses about 1.2 s after its header line, so its reply was being split across the next commands (seen in Run Diagnostics as an empty `STA.` reply and shifted results).
 
