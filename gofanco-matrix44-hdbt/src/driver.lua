@@ -1,22 +1,27 @@
 --[[
   GoFanco Matrix44-HDBT (DriverWorks)
-  AV switch driver for the gofanco Matrix44-HDBT (G4-0064B) over RS-232 (9600 8N1),
-  using the G4-0064B command set (OUTxx:yy., PowerON., STA_VIDEO. ...).
+  AV switch driver for the gofanco Matrix44-HDBT (G4-0064B) over RS-232 (9600 8N1)
+  or over the network (the matrix's LAN port, raw TCP port 23), using the
+  G4-0064B command set (OUTxx:yy., PowerON., STA_VIDEO. ...).
   Standard AV switch connection IDs (serial 1, proxy 5001, inputs 1000-1003, outputs 2000-2003).
+  The network connection is created at runtime on binding 6001 from the IP Address property.
 
   Author: Heatvent (with Claude)
   License: MIT (see LICENSE)
   Unofficial - not made or supported by gofanco or Snap One/Control4.
 ]]
 
-DRIVER_VERSION   = "3.1.0"
+DRIVER_VERSION   = "3.2.0"
 SERIAL_BINDING   = 1
+NETWORK_BINDING  = 6001
 PROXY_BINDING    = 5001
 NUM_PORTS        = 4
 
 SETTLE_MS        = 400    -- reply is complete after this much silence
 NO_REPLY_MS      = 2000   -- move on if the matrix says nothing
 STARTUP_DELAY_MS = 5000
+RECONNECT_MS     = 15000  -- retry a dropped network connection this often
+MAX_QUEUE        = 40     -- while offline, drop status queries beyond this
 RESET_CONFIRM    = "Yes, reset the matrix"
 
 gQueue      = {}          -- pending commands: { cmd=, onReply=fn(raw, text) }
@@ -25,6 +30,8 @@ gRx         = ""
 gSettleTimer, gNoReplyTimer, gPollTimer = nil, nil, nil
 gRoutes     = {}          -- gRoutes[output] = input
 gLastRoute  = { key = "", time = 0 }
+
+gNet = { address = nil, port = nil, online = false, timer = nil }
 
 ------------------------------------------------------------------ helpers
 
@@ -101,9 +108,109 @@ local function parseFeedback(raw)
   if ip then setProp("Matrix IP Address", ip) end
 end
 
------------------------------------------------------------------- serial queue
+------------------------------------------------------------------ transport (serial or network)
 
-local SendNext
+local SendNext            -- defined with the command queue below
+
+function UsingNetwork()
+  return (Properties["Connection Type"] or ""):find("Network") ~= nil
+end
+
+-- Serial is always "ready" (Control4 owns the port); network waits for ONLINE.
+local function transportReady()
+  return not UsingNetwork() or gNet.online
+end
+
+local function transmit(data)
+  if UsingNetwork() then
+    C4:SendToNetwork(NETWORK_BINDING, gNet.port, data)
+  else
+    C4:SendToSerial(SERIAL_BINDING, data)
+  end
+end
+
+local function netTarget()
+  local ip = (Properties["IP Address"] or ""):match("^%s*(%S+)%s*$")
+  local port = tonumber(Properties["Network Port"] or "") or 23
+  return ip, port
+end
+
+local function netStopTimer() gNet.timer = cancel(gNet.timer) end
+
+local function netDisconnect()
+  netStopTimer()
+  if gNet.address ~= nil then
+    C4:NetDisconnect(NETWORK_BINDING, gNet.port)
+    dbg("Network disconnected from " .. gNet.address .. ":" .. gNet.port)
+  end
+  gNet.address, gNet.port, gNet.online = nil, nil, false
+end
+
+local function netRetryLater()
+  netStopTimer()
+  gNet.timer = C4:SetTimer(RECONNECT_MS, function()
+    gNet.timer = nil
+    if UsingNetwork() and not gNet.online and gNet.address ~= nil then
+      dbg("Network reconnect attempt")
+      C4:NetConnect(NETWORK_BINDING, gNet.port)
+      netRetryLater()
+    end
+  end)
+end
+
+-- (Re)open the link to match the Connection Type / IP Address / Network Port properties.
+function ApplyConnection()
+  if not UsingNetwork() then
+    netDisconnect()
+    setProp("Connection Status", "Serial (bind Serial RS-232 in Composer)")
+    SendNext()
+    return
+  end
+  local ip, port = netTarget()
+  if ip == nil or ip == "" then
+    netDisconnect()
+    setProp("Connection Status", "Network: set the IP Address property")
+    return
+  end
+  if gNet.address == ip and gNet.port == port then return end
+  netDisconnect()
+  gNet.address, gNet.port = ip, port
+  setProp("Connection Status", "Connecting to " .. ip .. ":" .. port)
+  C4:CreateNetworkConnection(NETWORK_BINDING, ip)
+  C4:NetPortOptions(NETWORK_BINDING, port, "TCP", {
+    AUTO_CONNECT = true, MONITOR_CONNECTION = true, KEEP_CONNECTION = true,
+  })
+  C4:NetConnect(NETWORK_BINDING, port)
+  netRetryLater()
+end
+
+function OnConnectionStatusChanged(idBinding, nPort, strStatus)
+  if idBinding ~= NETWORK_BINDING then return end
+  dbg("Network " .. tostring(nPort) .. ": " .. tostring(strStatus))
+  if strStatus == "ONLINE" then
+    local wasOnline = gNet.online
+    gNet.online = true
+    netStopTimer()
+    setProp("Connection Status", "Online (network " .. tostring(gNet.address) .. ")")
+    if not wasOnline then
+      RefreshStatus()
+    end
+    SendNext()
+  else
+    gNet.online = false
+    if UsingNetwork() and gNet.address ~= nil then
+      setProp("Connection Status", "Offline - retrying " .. gNet.address .. ":" .. tostring(gNet.port))
+      netRetryLater()
+    end
+  end
+end
+
+------------------------------------------------------------------ command queue
+
+local function onlineLabel()
+  if UsingNetwork() then return "Online (network " .. tostring(gNet.address) .. ")" end
+  return "Online"
+end
 
 local function finish(raw)
   gNoReplyTimer = cancel(gNoReplyTimer)
@@ -115,7 +222,9 @@ local function finish(raw)
     local text = clean(raw)
     if raw == nil then text = "(no reply)" elseif text == "" then text = "(empty reply)" end
     note(text)
-    setProp("Connection Status", raw == nil and "No reply from matrix" or "Online")
+    if transportReady() then
+      setProp("Connection Status", raw == nil and "No reply from matrix" or onlineLabel())
+    end
     dbg(item.cmd .. " -> " .. text)
     if raw ~= nil then parseFeedback(raw) end
     if item.onReply ~= nil then item.onReply(raw or "", text) end
@@ -125,11 +234,12 @@ end
 
 SendNext = function()
   if gCurrent ~= nil or #gQueue == 0 then return end
+  if not transportReady() then return end     -- network: wait for ONLINE
   gCurrent = table.remove(gQueue, 1)
   gRx = ""
   setProp("Last Command Sent", gCurrent.cmd)
   dbg("TX: " .. gCurrent.cmd)
-  C4:SendToSerial(SERIAL_BINDING, gCurrent.cmd)
+  transmit(gCurrent.cmd)
   gNoReplyTimer = C4:SetTimer(NO_REPLY_MS, function()
     gNoReplyTimer = nil
     if gRx == "" then finish(nil) end
@@ -142,6 +252,10 @@ function Send(cmd, onReply, priority)
   if cmd == nil or cmd == "" then return end
   if cmd:sub(-1) ~= "." then cmd = cmd .. "." end
   local item = { cmd = cmd, onReply = onReply, pri = priority and true or false }
+  if not priority and #gQueue >= MAX_QUEUE then
+    dbg("Queue full (matrix offline?), dropped " .. cmd)
+    return
+  end
   if priority then
     local pos = 1
     while gQueue[pos] ~= nil and gQueue[pos].pri do pos = pos + 1 end
@@ -152,8 +266,9 @@ function Send(cmd, onReply, priority)
   SendNext()
 end
 
-function ReceivedFromSerial(idBinding, strData)
-  if idBinding ~= SERIAL_BINDING then return end
+-- Replies and the matrix's own status lines (front panel, IR remote, and over
+-- the network, changes made by other clients such as Home Assistant).
+local function onData(strData)
   dbg("RX: " .. strData)
   gRx = gRx .. strData
   gSettleTimer = cancel(gSettleTimer)
@@ -167,6 +282,16 @@ function ReceivedFromSerial(idBinding, strData)
       gRx = ""
     end
   end)
+end
+
+function ReceivedFromSerial(idBinding, strData)
+  if idBinding ~= SERIAL_BINDING or UsingNetwork() then return end
+  onData(strData)
+end
+
+function ReceivedFromNetwork(idBinding, nPort, strData)
+  if idBinding ~= NETWORK_BINDING or not UsingNetwork() then return end
+  onData(strData)
 end
 
 ------------------------------------------------------------------ routing
@@ -424,18 +549,32 @@ function StartPolling()
   end
 end
 
+local CONNECTION_PROPS = { ["Connection Type"] = true, ["IP Address"] = true, ["Network Port"] = true }
+
 function OnPropertyChanged(strProperty)
-  if strProperty == "Poll Interval" then StartPolling() end
+  if strProperty == "Poll Interval" then StartPolling()
+  elseif CONNECTION_PROPS[strProperty] then
+    -- Anything half-sent belongs to the old link; start clean.
+    gNoReplyTimer = cancel(gNoReplyTimer)
+    gSettleTimer = cancel(gSettleTimer)
+    gCurrent, gRx = nil, ""
+    ApplyConnection()
+    if not UsingNetwork() then RefreshStatus() end   -- network refreshes once ONLINE
+  end
 end
 
 function OnDriverLateInit()
   setProp("Driver Version", DRIVER_VERSION)
   StartPolling()
-  C4:SetTimer(STARTUP_DELAY_MS, function() RefreshStatus() end)
+  ApplyConnection()
+  if not UsingNetwork() then
+    C4:SetTimer(STARTUP_DELAY_MS, function() RefreshStatus() end)
+  end
 end
 
 function OnDriverDestroyed()
   gPollTimer = cancel(gPollTimer)
   gSettleTimer = cancel(gSettleTimer)
   gNoReplyTimer = cancel(gNoReplyTimer)
+  netDisconnect()
 end

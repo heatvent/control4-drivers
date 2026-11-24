@@ -4,7 +4,7 @@ Free, open-source Control4 DriverWorks drivers by **Heatvent (with Claude)**.
 
 | Driver | Device | Control | Latest |
 |---|---|---|---|
-| [GoFanco Matrix44-HDBT](gofanco-matrix44-hdbt/) | gofanco Matrix44-HDBT 4x4 HDMI 2.0 HDBaseT matrix (G4-0064B) | RS-232 | 3.1.0 |
+| [GoFanco Matrix44-HDBT](gofanco-matrix44-hdbt/) | gofanco Matrix44-HDBT 4x4 HDMI 2.0 HDBaseT matrix (G4-0064B) | RS-232 or IP (TCP) | 3.2.0 |
 
 ## Installing a driver
 
