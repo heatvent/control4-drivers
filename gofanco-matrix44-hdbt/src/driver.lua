@@ -11,13 +11,15 @@
   Unofficial - not made or supported by gofanco or Snap One/Control4.
 ]]
 
-DRIVER_VERSION   = "3.2.0"
+DRIVER_VERSION   = "3.2.1"
 SERIAL_BINDING   = 1
 NETWORK_BINDING  = 6001
 PROXY_BINDING    = 5001
 NUM_PORTS        = 4
 
 SETTLE_MS        = 400    -- reply is complete after this much silence
+SLOW_SETTLE_MS   = 2000   -- STA. pauses ~1.2 s after its header line
+SLOW_COMMANDS    = { ["STA."] = true, ["/^Version."] = true }
 NO_REPLY_MS      = 2000   -- move on if the matrix says nothing
 STARTUP_DELAY_MS = 5000
 RECONNECT_MS     = 15000  -- retry a dropped network connection this often
@@ -272,7 +274,9 @@ local function onData(strData)
   dbg("RX: " .. strData)
   gRx = gRx .. strData
   gSettleTimer = cancel(gSettleTimer)
-  gSettleTimer = C4:SetTimer(SETTLE_MS, function()
+  local settle = SETTLE_MS
+  if gCurrent ~= nil and SLOW_COMMANDS[gCurrent.cmd] then settle = SLOW_SETTLE_MS end
+  gSettleTimer = C4:SetTimer(settle, function()
     gSettleTimer = nil
     if gCurrent ~= nil then
       finish(gRx)

@@ -16,7 +16,7 @@ It works as a normal Control4 AV switch, so rooms route sources through the matr
 |---|---|
 | Matrix | gofanco Matrix44-HDBT, firmware V1.0.1, CPLD V1.0.0 |
 | Control | RS-232 at 9600 8N1, from a Control4 EA-series controller serial port |
-| Network | Raw TCP on port 23: same commands as RS-232, checked against the matrix directly. Network mode in this driver is new in 3.2.0 and has not yet run on a controller. |
+| Network | Raw TCP on port 23, from the same controller (same commands as RS-232) |
 | Control4 OS / Composer Pro | 3.4.3 |
 
 The network port takes more than one client at once and sends every change to all of them. So Control4 and another system, such as Home Assistant, can both be connected, and each sees the other's routing changes.

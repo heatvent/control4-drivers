@@ -6,7 +6,7 @@
   <model>Matrix44-HDBT</model>
   <created>11/22/2026 12:00 PM</created>
   <modified>11/23/2026 09:00 PM</modified>
-  <version>6</version>
+  <version>7</version>
   <small image_source="c4z">icons/device_sm.png</small>
   <large image_source="c4z">icons/device_lg.png</large>
   <control>lua_gen</control>
@@ -151,7 +151,7 @@ PROGRAMMING COMMANDS
 Route Input To Output, Route Input To All Outputs, Recall Preset, Power On, Power Off, Refresh Status, Send Raw Command.
 ]]></documentation>
     <properties>
-      <property><name>Driver Version</name><type>STRING</type><readonly>true</readonly><default>3.2.0</default></property>
+      <property><name>Driver Version</name><type>STRING</type><readonly>true</readonly><default>3.2.1</default></property>
       <property>
         <name>Connection Type</name><type>LIST</type><readonly>false</readonly>
         <items><item>Serial (RS-232)</item><item>Network (TCP/IP)</item></items>

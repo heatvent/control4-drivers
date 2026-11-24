@@ -1,5 +1,8 @@
 # Changelog
 
+## 3.2.1 — 2026-11-23
+- `STA.` and `/^Version.` now wait up to 2 s of silence before their reply is treated as complete. `STA.` pauses about 1.2 s after its header line, so its reply was being split across the next commands (seen in Run Diagnostics as an empty `STA.` reply and shifted results).
+
 ## 3.2.0 — 2026-11-23
 - Network control: new **Connection Type** property (Serial (RS-232) / Network (TCP/IP)) with **IP Address** and **Network Port** (default 23). One driver covers both. On the network, the driver opens the connection itself, holds commands while offline, reconnects every 15 s, and reads status once it's online.
 - Routing changes pushed by the matrix (including ones made by other network clients) update Control4.
